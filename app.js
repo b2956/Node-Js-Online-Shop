@@ -16,23 +16,23 @@ const shopRoutes = require("./routes/shopRoute");
 
 const errorController = require("./controllers/404");
 
-const mongoConnect = require('./utilities/database').mongoConnect;
+const mongoose = require('mongoose');
 
 const User = require('./Models/User');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-app.use((req, res, next) => {
-    User.findById('5eb338e66f23bed6e5ed0fc3')
-        .then(user => {
-            req.user = new User(user.name, user.email, user.cart, user._id);
-            next();
-        })
-        .catch(err => {
-            console.log(err);
-        }
-    );
-});
+// app.use((req, res, next) => {
+//     User.findById('5eb338e66f23bed6e5ed0fc3')
+//         .then(user => {
+//             req.user = new User(user.name, user.email, user.cart, user._id);
+//             next();
+//         })
+//         .catch(err => {
+//             console.log(err);
+//         }
+//     );
+// });
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -42,10 +42,16 @@ app.use(shopRoutes);
 
 app.use(errorController.get404Page);
 
-mongoConnect(() => {
-    console.log('Server is connected');
-
+mongoose.connect('mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+})
+.then(result => {
     app.listen(3000);
+    console.log('Server is connected');
+})
+.catch(err => {
+    console.log(err);
 });
 
 
