@@ -15,13 +15,15 @@ exports.postAddProduct = (req, res, next) => {
   const imageUrl = req.body.imageUrl;
   const price = req.body.price;
   const description = req.body.description;
-  // const userId = req.user._id;
+  const userId = req.user._id;
+
 
   const product = new Product({
     title,
     imageUrl,
     price,
     description,
+    userId
   });
 
   product.save()
@@ -107,7 +109,10 @@ exports.postDeleteProduct = (req, res, next) => {
 exports.getAdminProducts = (req, res, next) => {
   Product
     .find()
+    // .select('title price -_id') // to choose fields you want and you don't want
+    // .populate('userId', 'name') // first argument is the one to be populated and second data to be retrieved
     .then((products) => {
+      // console.log(products);
       res.render("admin/products", {
         prods: products,
         pageTitle: "Admin Products",

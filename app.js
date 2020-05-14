@@ -22,17 +22,19 @@ const User = require('./Models/User');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
-// app.use((req, res, next) => {
-//     User.findById('5eb338e66f23bed6e5ed0fc3')
-//         .then(user => {
-//             req.user = new User(user.name, user.email, user.cart, user._id);
-//             next();
-//         })
-//         .catch(err => {
-//             console.log(err);
-//         }
-//     );
-// });
+app.use((req, res, next) => {
+
+    User.findById('5ebd8d977d39e8281bd5174e')
+        .then(user => {
+            // console.log(user);
+            req.user = user;
+            next();
+        })
+        .catch(err => {
+            console.log(err);
+        }
+    );
+});
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -45,6 +47,23 @@ app.use(errorController.get404Page);
 mongoose.connect('mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
+})
+.then(result => {
+    return User.findOne() 
+})
+.then( user => {
+    if (!user) {
+        const user = new User({
+            name: 'Bruno',
+            email: 'bruno@test.com',
+            cart: {
+                items: []
+            }
+        });
+        user.save();
+    }
+    // console.log(user);
+    return user;
 })
 .then(result => {
     app.listen(3000);
