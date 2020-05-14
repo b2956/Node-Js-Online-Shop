@@ -1,0 +1,28 @@
+<%- include('../includes/head.ejs') %>
+<style>
+.card__image {
+max-width: 60vw;
+margin: auto;
+}
+</style>
+    </head>
+
+    <body>
+        <%- include('../includes/navigation.ejs') %>
+        <main class="centered">
+
+            <h1><%= product.title %></h1>
+            <hr>
+            <div class="card__image">
+                <img src="<%= product.imageUrl %>" alt="<%= product.title %>">
+            </div>
+            <h2>$<%= product.price %></h2>
+            <p><%= product.description %></p>
+
+            <div class="card__actions">
+                <%- include('../includes/add-to-cart.ejs', {product: product}) %>
+            </div>
+
+            
+        </main>
+        <%- include('../includes/end.ejs') %>
