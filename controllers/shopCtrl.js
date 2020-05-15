@@ -5,7 +5,7 @@ exports.getProducts = (req, res, next) => {
 
   Product.find()
     .then(products => {
-      console.log(products);
+      // console.log(products);
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
@@ -40,7 +40,7 @@ exports.getIndex = (req, res, next) => {
 
   Product.find()
     .then(products => {
-      console.log(products);
+      // console.log(products);
       res.render("shop/product-list", {
         prods: products,
         pageTitle: "All Products",
@@ -147,7 +147,7 @@ exports.postCreateOrder = (req, res, next) => {
     return order
   })
   .then(order => {
-    console.log(order);
+    // console.log(order);
     order.save()
   })
   .then(result => {
@@ -166,7 +166,7 @@ exports.getOrders = (req, res, next) => {
       'user.userId': req.user._id
     })
     .then(orders => {
-      console.log(orders);
+      // console.log(orders);
       res.render("shop/orders", {
         pageTitle: "Your Orders",
         path: "/orders",
