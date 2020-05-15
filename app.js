@@ -1,54 +1,55 @@
 const express = require("express");
-
 const bodyParser = require("body-parser");
+const mongoose = require('mongoose');
+const path = require("path");
+const session = require('express-session');
+const MongoDbStoreSession = require('connect-mongodb-session')(session);
+
+const MongoDbUriString = 'mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority';
 
 const app = express();
+const mongoDbStore = new MongoDbStoreSession({
+    uri: MongoDbUriString,
+    collection: 'sessions'
 
-app.set("view engine", "ejs");
-
-app.set("views", "views");
-
-const path = require("path");
+});
 
 const adminRoutes = require("./routes/adminRoutes");
-
 const shopRoutes = require("./routes/shopRoute");
-
 const authRoutes = require('./routes/authRoutes');
-
 const errorController = require("./controllers/404");
 
-const mongoose = require('mongoose');
+app.set("view engine", "ejs");
+app.set("views", "views");
 
 const User = require('./Models/User');
 
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(path.join(__dirname, "public")));
+app.use(session({
+    secret: 'my secret', 
+    resave: false,
+    saveUninitialized: false,
+    store: mongoDbStore
+}));
 
 app.use((req, res, next) => {
+    if (req.session.user) {
+        const { userId } = req.session.user;
 
-    User.findById('5ebdb631e8294f6040b37172')
-        .then(user => {
-            // console.log(user);
-            req.user = user;
-            next();
-        })
-        .catch(err => {
-            console.log(err);
-        }
-    );
-});
+        req.user = User.findById(userId);
+        next();
+    }
 
-app.use(express.static(path.join(__dirname, "public")));
+    next()
+})
 
 app.use("/admin", adminRoutes);
-
 app.use(shopRoutes);
-
 app.use(authRoutes);
-
 app.use(errorController.get404Page);
 
-mongoose.connect('mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority', {
+mongoose.connect( MongoDbUriString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })

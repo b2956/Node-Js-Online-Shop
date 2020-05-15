@@ -15,7 +15,7 @@
             <li class="main-header__item">
                 <a class="<%= path === '/orders' ? 'active' : '' %>" href="/orders">Orders</a>
             </li>
-            <!--
+            <% if(isLoggedIn) { %>
                 <li class="main-header__item">
                     <a class="<%= path === '/admin/add-product' ? 'active' : '' %>" href="/admin/add-product">Add Product
                     </a>
@@ -24,7 +24,8 @@
                     <a class="<%= path === '/admin/products' ? 'active' : '' %>" href="/admin/products">Admin Products
                     </a>
                 </li>
-            -->
+
+            <% } %>  
         </ul>
         <ul class="main-header__item-list">
             <li class="main-header__item">
