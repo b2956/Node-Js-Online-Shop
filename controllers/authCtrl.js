@@ -10,11 +10,17 @@ exports.getLogin = (req, res, next) => {
     //     .split('=')[1]
     // ;
     // console.log(req.session.isLoggedIn);
+    let errorMessage = req.flash('error');
+    if ( errorMessage.length > 0 ) {
+      errorMessage = errorMessage[0];
+    } else {
+      errorMessage = null;
+    }
 
     res.render('auth/login', {
       pageTitle: "User Login",
       path: "/login",
-      isLoggedIn: req.session.isLoggedIn
+      errorMessage
     });
 }
 
@@ -25,13 +31,15 @@ exports.postLogin = (req, res, next) => {
     .findOne({ email : email })
     .then(user => {
       if (!user) {
+        req.flash('error', 'Invalid email or password');
         return res.redirect('/login');
       }
       bcrypt
       .compare(password, user.password)
       .then(doMatch => {
         if(!doMatch) {
-          return res.redirect('login');
+          req.flash('error', 'Invalid email or password');
+          return res.redirect('/login');
         }
         req.session.isLoggedIn = true;
         req.session.user = user;
@@ -42,6 +50,7 @@ exports.postLogin = (req, res, next) => {
       })
       .catch(err => {
         console.log(err);
+        req.flash('error', 'Invalid email or password');
         res.redirect('/login');
       })
     })
@@ -61,10 +70,18 @@ exports.postLogout = (req, res, next) => {
 }
 
 exports.getSignUp = (req, res, next) => {
+  let errorMessage = req.flash('error');
+
+  if ( errorMessage.length > 0 ) {
+    errorMessage = errorMessage[0];
+  } else {
+    errorMessage = null;
+  }
+
   res.render('auth/signup', {
     pageTitle: 'Sign Up',
     path: '/signup',
-    isLoggedIn: req.session.isLoggedIn
+    errorMessage
   })
 }
 
@@ -74,6 +91,7 @@ exports.postSignUp = (req, res, next) => {
   User.findOne({email: email})
   .then(userDoc => {
     if (userDoc) {
+      req.flash('error', 'E-mail already used');
       return res.redirect('/signup');
     }
 

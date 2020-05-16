@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDbStoreSession = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
+const connectFlash = require('connect-flash');
 
 const MongoDbUriString = 'mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority';
 
@@ -36,6 +37,7 @@ app.use(session({
     store: mongoDbStore
 }));
 app.use(csrfProtection);
+app.use(connectFlash());
 
 app.use((req, res, next) => {
     if(!req.session.user) {
