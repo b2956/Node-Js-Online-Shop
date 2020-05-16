@@ -8,7 +8,7 @@ exports.getLogin = (req, res, next) => {
     //     .trim()
     //     .split('=')[1]
     // ;
-    console.log(req.session.isLoggedIn);
+    // console.log(req.session.isLoggedIn);
 
     res.render('auth/login', {
       pageTitle: "User Login",
@@ -18,21 +18,16 @@ exports.getLogin = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
-
   User
     .findById('5ebdb631e8294f6040b37172')
     .then(user => {
-        // console.log(user);
-      return(
-        req.session.user = {
-          userId: user._id,
-          name: user.name
-        },
-        req.session.isLoggedIn = true
-      )
-    })
-    .then(result => {
-      res.redirect('/');
+      // console.log(user);
+      req.session.isLoggedIn = true;
+      req.session.user = user;
+      req.session.save((err) => {
+        console.log(err);
+        res.redirect('/');
+      });
     })
     .catch(err => {
       console.log(err);
@@ -40,4 +35,11 @@ exports.postLogin = (req, res, next) => {
   );
   // res.setHeader('Set-Cookie', 'loggedIn=true'); //  Expires=date Max-Age=time in seconds; Domain=tracking domain; Secure for https, HttpOnly;
   
+}
+
+exports.postLogout= (req, res, next) => {
+  req.session.destroy((err) => {
+    console.log(err);
+    res.redirect('/');
+  });
 }

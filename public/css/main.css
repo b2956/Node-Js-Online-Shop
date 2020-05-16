@@ -19,6 +19,18 @@ form {
   display: inline;
 }
 
+.main-header__item form button {
+  background-color: #00695c;
+  border: none;
+  font-size: 16px;
+  color: #fff;
+}
+
+.main-header__item form button:hover {
+  color: #ffeb3b;
+  cursor: pointer;
+}
+
 .centered {
   text-align: center;
 }
