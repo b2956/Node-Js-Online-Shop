@@ -19,6 +19,7 @@
                 <input type="password" name="password" class="login-form__input" id="password">
             </div>
             
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <button type="submit" class="btn">Login</button>
         </form>
     </main>

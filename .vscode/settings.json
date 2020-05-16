@@ -1,0 +1,11 @@
+{
+    "emmet.excludeLanguages": [
+
+        "markdown",
+        "javascript",
+        "javascriptreact",
+    ],
+    "emmet.includeLanguages": {
+    
+    }
+}

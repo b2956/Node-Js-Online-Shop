@@ -1,9 +1,11 @@
+const path = require("path");
+
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
-const path = require("path");
 const session = require('express-session');
 const MongoDbStoreSession = require('connect-mongodb-session')(session);
+const csrf = require('csurf');
 
 const MongoDbUriString = 'mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority';
 
@@ -13,6 +15,7 @@ const mongoDbStore = new MongoDbStoreSession({
     collection: 'sessions'
 
 });
+const csrfProtection = csrf();
 
 const adminRoutes = require("./routes/adminRoutes");
 const shopRoutes = require("./routes/shopRoute");
@@ -32,6 +35,7 @@ app.use(session({
     saveUninitialized: false,
     store: mongoDbStore
 }));
+app.use(csrfProtection);
 
 app.use((req, res, next) => {
     if(!req.session.user) {
@@ -48,6 +52,12 @@ app.use((req, res, next) => {
             console.log(err);
         });
     
+});
+
+app.use((req, res, next) => {
+    res.locals.isLoggedIn = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
 })
 
 app.use("/admin", adminRoutes);
@@ -59,23 +69,6 @@ mongoose.connect( MongoDbUriString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
-// .then(result => {
-//     return User.findOne() 
-// })
-// .then( user => {
-//     if (!user) {
-//         const user = new User({
-//             name: 'Bruno',
-//             email: 'bruno@test.com',
-//             cart: {
-//                 items: []
-//             }
-//         });
-//         user.save();
-//     }
-//     // console.log(user);
-//     return user;
-// })
 .then(result => {
     app.listen(3000);
     console.log('Server is connected');

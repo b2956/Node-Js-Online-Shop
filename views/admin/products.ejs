@@ -32,6 +32,7 @@
                                         <button class="btn" type="submit">Delete</button>
                                         <input type="hidden" name="productId" value="<%= product._id %>">
                                         <input type="hidden" name="productPrice" value="<%= product.price %>">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                     </form>
 
                                 </div>

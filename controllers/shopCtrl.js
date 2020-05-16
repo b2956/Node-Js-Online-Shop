@@ -49,7 +49,6 @@ exports.getIndex = (req, res, next) => {
         prods: products,
         pageTitle: "All Products",
         path: "/",
-        isLoggedIn: req.session.isLoggedIn
       });
     })
     .catch(err => {
@@ -111,6 +110,7 @@ exports.postDeleteCartItem = (req, res, next) => {
     req.user
       .deleteCartItem(prodId)
       .then(result => {
+        console.log('Product deleted from cart');
         res.redirect('/cart');
       })
       .catch(err => console.log(err));
@@ -148,7 +148,6 @@ exports.postCreateOrder = (req, res, next) => {
       const order = new Order({
         user: {
           userId: req.user._id,
-          name: req.user.name,
           email: req.user.email
         },
         products
