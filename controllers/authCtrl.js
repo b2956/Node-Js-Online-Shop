@@ -1,5 +1,21 @@
 const User = require('../Models/User');
 const bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer');
+const mailgunTransport = require('nodemailer-mailgun-transport');
+
+const { api_key, domain } = require('../utilities/mailGunAPIKey');
+
+const transporter = nodemailer.createTransport(mailgunTransport({
+  auth: {
+    api_key,
+    domain
+  }
+}));
+
+// var mailgun = require('mailgun-js')({
+//   apiKey: apiKey, 
+//   domain: domain
+// });
 
 exports.getLogin = (req, res, next) => {
     // console.log(req.get('Cookie', 'loggedIn'));
@@ -109,9 +125,33 @@ exports.postSignUp = (req, res, next) => {
   
       return user.save();
     })
-    .then(user => {
+    .then(result => {
+      // const emailOptions = {
+      //   from: 'Node Shop <me@samples.mailgun.org>',
+      //   to: email,        
+      //   subject: 'Sign Up succeeded!',
+      //   html: '<h1>You successfully signed up to our store!</h1>',
+      // };
       res.redirect('/login');
-    });
+      
+      return transporter.sendMail({
+        from: 'Node Shop <me@samples.mailgun.org>',
+        to: email,        
+        subject: 'Sign Up succeeded!',
+        html: '<h1>You successfully signed up to our store!</h1>'
+      });
+      
+      // return mailgun.messages().send(emailOptions, (error, body) => {
+      //   if(error) {
+      //     return console.log(error);
+      //   } else {
+      //     console.log("message sent!");
+      //   }
+      // });
+    })
+    .then(result => {
+      console.log('sign up email sent');
+    })
   })
   .catch(err => {
     console.log(err);
