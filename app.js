@@ -19,7 +19,7 @@ const mongoDbStore = new MongoDbStoreSession({
 const csrfProtection = csrf();
 
 const adminRoutes = require("./routes/adminRoutes");
-const shopRoutes = require("./routes/shopRoute");
+const shopRoutes = require("./routes/shopRoutes");
 const authRoutes = require('./routes/authRoutes');
 const errorController = require("./controllers/404");
 
