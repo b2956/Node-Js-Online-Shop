@@ -1,8 +1,10 @@
-const User = require('../Models/User');
+const crypto = require('crypto');
+
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const mailgunTransport = require('nodemailer-mailgun-transport');
 
+const User = require('../Models/User');
 const { api_key, domain } = require('../utilities/mailGunAPIKey');
 
 const transporter = nodemailer.createTransport(mailgunTransport({
@@ -156,4 +158,132 @@ exports.postSignUp = (req, res, next) => {
   .catch(err => {
     console.log(err);
   });
-}
+};
+
+exports.getResetPassword = (req, res, next) => {
+  let errorMessage = req.flash('error');
+
+  if ( errorMessage.length > 0 ) {
+    errorMessage = errorMessage[0];
+  } else {
+    errorMessage = null;
+  }
+
+  res.render('auth/reset-password', {
+    path: '/reset',
+    pageTitle: 'Reset Password',
+    errorMessage
+  });
+};
+
+exports.postResetPassword = (req, res, next) => {
+  const { email } = req.body;
+
+  crypto.randomBytes(32, (err, buffer) => {
+    if (err) {
+      console.log(err);
+      return res.redirect('/reset-password');
+    }
+
+    const token = buffer.toString('hex');
+
+    User.findOne({ 
+      email : email 
+    })
+    .then(user => {
+      if(!user) {
+        req.flash('error', 'No account with that email found!');
+        return res.redirect('/reset-password');
+      }
+
+      user.resetToken = token;
+      user.resetTokenExpiration = Date.now() + 3600000;
+
+      return user.save()
+      .then(result => {
+        res.redirect('/');
+  
+        transporter.sendMail({
+          from: 'Node Shop <me@samples.mailgun.org>',
+          to: email,        
+          subject: 'Password Reset',
+          html: `
+            <h1>Here's your password reset link!</h1>
+            <nbr></nbr>
+            <p>This is the <a href="http://localhost:3000/set-new-password/${token}">link</a> for reseting your password, if you didn't ask for a password reset don't click it, it will expire in 1 hour.</p>
+          `
+        });
+      })
+      .then(result => {
+        console.log('Reset password email sent!')
+      })
+    })
+    .catch(err => {
+      console.log(err);
+    })
+
+  });
+};
+
+exports.getSetNewPassword = (req, res, next) => {
+  const { token } = req.params;
+
+  User
+  .findOne({ 
+    resetToken: token,
+    resetTokenExpiration: {
+      $gt: Date.now()
+    } 
+  })
+  .then(user => {
+
+    if(!user) {
+      req.flash('error', 'Invalid password reset link');
+      return res.redirect('/login');
+    }
+
+    res.render('auth/set-new-password', {
+      path: '/set-new-password',
+      pageTitle: 'Set new Password',
+      userId: user._id.toString(),
+      token
+    });
+  })
+  .catch(err => {
+    console.log(err);
+  })
+
+  
+};
+
+exports.postSetNewPassword = (req, res, next) => {
+  const { password, userId, token } = req.body;
+  let user;
+
+  User
+  .findOne({
+    resetToken: token,
+    resetTokenExpiration: { $gt: Date.now() },
+    _id: userId
+  })
+  .then(retrievedUser => {
+    user = retrievedUser;
+
+    return bcrypt
+    .hash(password, 12);
+  })
+  .then(hashedPassword => {
+    user.password = hashedPassword;
+    user.resetToken = undefined;
+    user.resetTokenExpiration = undefined;
+
+    return user.save();    
+  })
+  .then(result => {
+    console.log('Password changed');
+    res.redirect('/login');
+  })
+  .catch(err => {
+    console.log(err);
+  });
+};
