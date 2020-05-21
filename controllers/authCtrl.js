@@ -39,11 +39,17 @@ exports.getLogin = (req, res, next) => {
     res.render('auth/login', {
       pageTitle: "User Login",
       path: "/login",
-      errorMessage
+      errorMessage,
+      oldInput: {
+        email: '',
+        password: '',
+      },
+      validationErrors: []
     });
 }
 
 exports.postLogin = (req, res, next) => {
+  const { email, password } = req.body;
 
   const errors = validationResult(req);
 
@@ -51,25 +57,44 @@ exports.postLogin = (req, res, next) => {
     return res.status(422).render('auth/login', {
       pageTitle: 'Login',
       path: '/login',
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+      },
+      validationErrors: errors.array()
     });
   }
-
-  const { email, password } = req.body;
 
   User
     .findOne({ email : email })
     .then(user => {
       if (!user) {
-        req.flash('error', 'Invalid email or password');
-        return res.redirect('/login');
+        return res.status(422).render('auth/login', {
+          pageTitle: 'Login',
+          path: '/login',
+          errorMessage: 'Invalid Email',
+          oldInput: {
+            email,
+            password,
+          },
+          validationErrors: [{param: 'email'}]
+        });
       }
       bcrypt
       .compare(password, user.password)
       .then(doMatch => {
         if(!doMatch) {
-          req.flash('error', 'Invalid email or password');
-          return res.redirect('/login');
+          return res.status(422).render('auth/login', {
+            pageTitle: 'Login',
+            path: '/login',
+            errorMessage: 'Invalid password',
+            oldInput: {
+              email,
+              password,
+            },
+            validationErrors: [{param: 'password'}]
+          });
         }
         req.session.isLoggedIn = true;
         req.session.user = user;
@@ -111,22 +136,35 @@ exports.getSignUp = (req, res, next) => {
   res.render('auth/signup', {
     pageTitle: 'Sign Up',
     path: '/signup',
-    errorMessage
+    errorMessage,
+    oldInput: {
+      email: '',
+      password: '',
+      confirmedPassword: ''
+    },
+    validationErrors: []
   })
 }
 
 exports.postSignUp = (req, res, next) => {
   const errors = validationResult(req);
+  // console.log(errors.array());
+
+  const { email, password, confirmedPassword } = req.body;
 
   if(!errors.isEmpty()) {
     return res.status(422).render('auth/signup', {
       pageTitle: 'Sign Up',
       path: '/signup',
-      errorMessage: errors.array()[0].msg
+      errorMessage: errors.array()[0].msg,
+      oldInput: {
+        email,
+        password,
+        confirmedPassword
+      },
+      validationErrors: errors.array()
     });
   }
-
-  const { email, password } = req.body;
 
   bcrypt
     .hash(password, 12)

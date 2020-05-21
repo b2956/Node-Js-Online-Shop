@@ -17,12 +17,24 @@
         <form action="/login" method="post" class="login-form" novalidate>
             <div class="form-control">
                 <label for="email" class="login-form__label">Email</label>
-                <input type="email" name="email" class="login-form__input" id="email">
+                <input 
+                class="<%= validationErrors.find(error => error.param === 'email') ? 'invalid' : '' %>"
+                type="email" 
+                name="email" 
+                class="login-form__input" 
+                id="email" 
+                value="<%= oldInput.email %>" >
             </div>
             
             <div class="form-control">
                 <label for="password" class="login-form__label">Password</label>
-                <input type="password" name="password" class="login-form__input" id="password">
+                <input 
+                class="<%= validationErrors.find(error => error.param === 'password') ? 'invalid' : '' %>"
+                type="password" 
+                name="password" 
+                class="login-form__input" 
+                id="password" 
+                value="<%= oldInput.password %>" >
             </div>
             
             <input type="hidden" name="_csrf" value="<%= csrfToken %>">
