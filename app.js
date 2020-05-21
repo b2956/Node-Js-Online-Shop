@@ -20,7 +20,7 @@ const csrfProtection = csrf();
 const adminRoutes = require("./routes/adminRoutes");
 const shopRoutes = require("./routes/shopRoutes");
 const authRoutes = require('./routes/authRoutes');
-const errorController = require("./controllers/404");
+const pageNotFoundController = require("./controllers/404");
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -64,7 +64,7 @@ app.use((req, res, next) => {
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
-app.use(errorController.get404Page);
+app.use(pageNotFoundController.get404Page);
 
 mongoose.connect( MongoDbUriString, {
     useNewUrlParser: true,
