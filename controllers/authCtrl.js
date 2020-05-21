@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer');
 const mailgunTransport = require('nodemailer-mailgun-transport');
+const { validationResult } = require('express-validator');
 
 const User = require('../Models/User');
 const { api_key, domain } = require('../utilities/mailGunAPIKey');
@@ -43,6 +44,17 @@ exports.getLogin = (req, res, next) => {
 }
 
 exports.postLogin = (req, res, next) => {
+
+  const errors = validationResult(req);
+
+  if(!errors.isEmpty()) {
+    return res.status(422).render('auth/login', {
+      pageTitle: 'Login',
+      path: '/login',
+      errorMessage: errors.array()[0].msg
+    });
+  }
+
   const { email, password } = req.body;
 
   User
@@ -82,7 +94,7 @@ exports.postLogin = (req, res, next) => {
 
 exports.postLogout = (req, res, next) => {
   req.session.destroy((err) => {
-    console.log(err);
+    if (err) { console.log(err); }
     res.redirect('/');
   });
 }
@@ -104,16 +116,19 @@ exports.getSignUp = (req, res, next) => {
 }
 
 exports.postSignUp = (req, res, next) => {
-  const { email, password, confirmedPassword } = req.body;
+  const errors = validationResult(req);
 
-  User.findOne({email: email})
-  .then(userDoc => {
-    if (userDoc) {
-      req.flash('error', 'E-mail already used');
-      return res.redirect('/signup');
-    }
+  if(!errors.isEmpty()) {
+    return res.status(422).render('auth/signup', {
+      pageTitle: 'Sign Up',
+      path: '/signup',
+      errorMessage: errors.array()[0].msg
+    });
+  }
 
-    return bcrypt
+  const { email, password } = req.body;
+
+  bcrypt
     .hash(password, 12)
     .then(hashedPassword => {
 
@@ -124,40 +139,27 @@ exports.postSignUp = (req, res, next) => {
           items: []
         }
       });
-  
+    
       return user.save();
     })
     .then(result => {
-      // const emailOptions = {
-      //   from: 'Node Shop <me@samples.mailgun.org>',
-      //   to: email,        
-      //   subject: 'Sign Up succeeded!',
-      //   html: '<h1>You successfully signed up to our store!</h1>',
-      // };
+
       res.redirect('/login');
-      
+        
       return transporter.sendMail({
         from: 'Node Shop <me@samples.mailgun.org>',
         to: email,        
         subject: 'Sign Up succeeded!',
         html: '<h1>You successfully signed up to our store!</h1>'
       });
-      
-      // return mailgun.messages().send(emailOptions, (error, body) => {
-      //   if(error) {
-      //     return console.log(error);
-      //   } else {
-      //     console.log("message sent!");
-      //   }
-      // });
+        
     })
     .then(result => {
       console.log('sign up email sent');
     })
-  })
-  .catch(err => {
-    console.log(err);
-  });
+    .catch(err => {
+      console.log(err);
+    });
 };
 
 exports.getResetPassword = (req, res, next) => {

@@ -24,6 +24,7 @@
     "ejs": "^3.0.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "express-validator": "^6.5.0",
     "mailgun-js": "^0.22.0",
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.14",
