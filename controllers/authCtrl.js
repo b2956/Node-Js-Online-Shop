@@ -7,6 +7,7 @@ const { validationResult } = require('express-validator');
 
 const User = require('../Models/User');
 const { api_key, domain } = require('../utilities/mailGunAPIKey');
+const errorCall = require('../utilities/errorCall');
 
 const transporter = nodemailer.createTransport(mailgunTransport({
   auth: {
@@ -99,7 +100,10 @@ exports.postLogin = (req, res, next) => {
         req.session.isLoggedIn = true;
         req.session.user = user;
         return req.session.save((err) => {
-          console.log(err);
+          if(err) {
+            console.log(err);
+          }
+          
           res.redirect('/');
         });
       })
@@ -110,7 +114,7 @@ exports.postLogin = (req, res, next) => {
       })
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
     }
   );
   // res.setHeader('Set-Cookie', 'loggedIn=true'); //  Expires=date Max-Age=time in seconds; Domain=tracking domain; Secure for https, HttpOnly;
@@ -196,7 +200,7 @@ exports.postSignUp = (req, res, next) => {
       console.log('sign up email sent');
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
     });
 };
 
@@ -259,7 +263,7 @@ exports.postResetPassword = (req, res, next) => {
       })
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
     })
 
   });
@@ -290,7 +294,7 @@ exports.getSetNewPassword = (req, res, next) => {
     });
   })
   .catch(err => {
-    console.log(err);
+    return errorCall(next, err);
   })
 
   
@@ -324,6 +328,6 @@ exports.postSetNewPassword = (req, res, next) => {
     res.redirect('/login');
   })
   .catch(err => {
-    console.log(err);
+    return errorCall(next, err);
   });
 };

@@ -1,6 +1,6 @@
 const Product = require("../Models/Product");
 const Order = require('../Models/Order');
-const User = require('../Models/User');
+const errorCall = require('../utilities/errorCall');
 
 exports.getProducts = (req, res, next) => {
 
@@ -14,7 +14,7 @@ exports.getProducts = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
     }
   );
 };
@@ -32,7 +32,7 @@ exports.getProduct = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err)
+      return errorCall(next, err);
     }
   );
 };
@@ -50,7 +50,7 @@ exports.getIndex = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
     }
   );
 
@@ -78,7 +78,9 @@ exports.getCart = (req, res, next) => {
         products: products,
       });
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      return errorCall(next, err);
+    });
 };
 
 exports.postAddToCart = (req, res, next) => {
@@ -97,7 +99,7 @@ exports.postAddToCart = (req, res, next) => {
       res.redirect('/cart');
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
   });
 };
 
@@ -110,7 +112,9 @@ exports.postDeleteCartItem = (req, res, next) => {
         console.log('Product deleted from cart');
         res.redirect('/cart');
       })
-      .catch(err => console.log(err));
+      .catch(err => {
+        return errorCall(next, err);
+      });
 };
 
 exports.getCheckout = (req, res, next) => {
@@ -162,7 +166,9 @@ exports.postCreateOrder = (req, res, next) => {
       console.log('order created, cart emptied')
       res.redirect('/orders');
     })
-    .catch(err => console.log(err));
+    .catch(err => {
+      return errorCall(next, err);
+    });
   
 };
 
@@ -179,6 +185,6 @@ exports.getOrders = (req, res, next) => {
       });
     })
     .catch(err => {
-      console.log(err);
+      return errorCall(next, err);
     });
 };

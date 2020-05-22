@@ -20,7 +20,7 @@ const csrfProtection = csrf();
 const adminRoutes = require("./routes/adminRoutes");
 const shopRoutes = require("./routes/shopRoutes");
 const authRoutes = require('./routes/authRoutes');
-const pageNotFoundController = require("./controllers/404");
+const errorController = require("./controllers/errorCtrl");
 
 app.set("view engine", "ejs");
 app.set("views", "views");
@@ -39,6 +39,13 @@ app.use(csrfProtection);
 app.use(connectFlash());
 
 app.use((req, res, next) => {
+    res.locals.isLoggedIn = req.session.isLoggedIn;
+    res.locals.csrfToken = req.csrfToken();
+    next();
+})
+
+app.use((req, res, next) => {
+    // throw new Error('Error');
     if(!req.session.user) {
         return next();
     }
@@ -46,25 +53,34 @@ app.use((req, res, next) => {
     User
         .findById(req.session.user._id)
         .then(user => {
+            if(!user) {
+                return next();
+            }
+
             req.user = user;
             next();
         })
         .catch(err => {
-            console.log(err);
+            next (new Error(err));
         });
     
 });
 
-app.use((req, res, next) => {
-    res.locals.isLoggedIn = req.session.isLoggedIn;
-    res.locals.csrfToken = req.csrfToken();
-    next();
-})
-
 app.use("/admin", adminRoutes);
 app.use(shopRoutes);
 app.use(authRoutes);
-app.use(pageNotFoundController.get404Page);
+
+app.get('/500', errorController.get500Page);
+
+app.use(errorController.get404Page);
+
+app.use((error, req, res, next) => {
+    res.status(500).render("500", {
+        pageTitle: "Error",
+        path: '/500',
+        isLoggedIn: req.session.isLoggedIn
+    });
+});
 
 mongoose.connect( MongoDbUriString, {
     useNewUrlParser: true,
