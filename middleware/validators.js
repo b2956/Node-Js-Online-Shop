@@ -70,15 +70,11 @@ exports.postLoginValidator = [
 exports.postAddProductValidator = [
     body('title')
     .trim()
-    .isAlphanumeric()
+    .isString()
     .isLength({
         min: 3
     })
     .withMessage('Invalid Title'),
-    body('imageUrl')
-    .trim()
-    .isURL()
-    .withMessage('Invalid Image Url'),
     body('price')
     .isNumeric()
     .withMessage('Invalid Price'),
@@ -99,10 +95,6 @@ exports.postEditProductValidator = [
         min: 3
     })
     .withMessage('Title must be at leat 3 characters long'),
-    body('imageUrl')
-    .trim()
-    .isURL()
-    .withMessage('Invalid Image Url'),
     body('price')
     .isFloat()
     .withMessage('Invalid Price'),
