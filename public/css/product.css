@@ -11,6 +11,23 @@
     margin: 1rem;
 }
 
+.card__image {
+    max-width: 80%;
+    height: 15rem;
+    margin: 15px auto;
+    text-align: center;
+}
+
+.card__image img{
+    height: 15rem;
+    width: auto;
+    margin: auto;
+}
+
+.card__content {
+   margin: 15px;
+}
+
 .product__title {
     font-size: 1.2rem;
     text-align: center;
