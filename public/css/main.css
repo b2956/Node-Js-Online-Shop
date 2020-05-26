@@ -206,6 +206,29 @@ form {
   margin: 0 0.25rem;
 }
 
+.pagination {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.pagination a,
+.pagination a:link {
+  text-decoration: none;
+  color: #00695c;
+  padding: 0.5rem 1rem;
+  border: 1px solid #00695c;
+  border-radius: 2px;
+  margin: 01rem;
+}
+
+.pagination a:hover,
+.pagination a:active,
+.pagination a.active { 
+  color: #fff;
+  background-color: #00695c;
+}
+
+
 .btn {
   display: inline-block;
   padding: 0.25rem 1rem;
