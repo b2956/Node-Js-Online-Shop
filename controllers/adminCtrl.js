@@ -4,13 +4,15 @@ const Product = require("../Models/Product");
 const errorCall = require('../utilities/errorCall');
 const fileHelper = require('../utilities/fileHelper');
 
+const itemsPerPage = 2;
+
 exports.getAddProduct = (req, res, next) => {
   // if (!req.session.isLoggedIn) {
   //   return res.redirect('/login');
   // }
   res.render("admin/edit-product", {
     pageTitle: "Add Product",
-    path: "/admin/add-product",
+    path: "/admin/add-product/",
     editing: false,
     hasError: false,
     errorMessage: null,
@@ -198,17 +200,34 @@ exports.postDeleteProduct = (req, res, next) => {
 }
 
 exports.getAdminProducts = (req, res, next) => {
+  let page  = +req.query.page || 1;
+  let totalProducts;
+
   Product
-    .find({ userId: req.user._id })
-    // .select('title price -_id') // to choose fields you want and you don't want
-    // .populate('userId', 'name') // first argument is the one to be populated and second data to be retrieved
-    .then((products) => {
-      // console.log(products);
-      res.render("admin/products", {
-        prods: products,
-        pageTitle: "Admin Products",
-        path: "/admin/products",  
-      });
+    .find()
+    .countDocuments()
+    .then(productsNumber => {
+
+      totalProducts = productsNumber;
+
+      return Product
+        .find({ userId: req.user._id })
+        .skip((page - 1) * itemsPerPage)
+        .limit(itemsPerPage)
+        .then((products) => {
+        
+          res.render("admin/products", {
+            prods: products,
+            pageTitle: "Admin Products",
+            path: "/admin/products",
+            currentPage: page,
+            hasNextPage: itemsPerPage * page < totalProducts,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page -1,
+            lastPage: Math.ceil(totalProducts / itemsPerPage) 
+          });
+        });
     })
     .catch((err) => {
       return errorCall(next, err);

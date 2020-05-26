@@ -9,17 +9,75 @@ const errorCall = require('../utilities/errorCall');
 const rootDir = require('../utilities/path');
 const deleteFile = require('../utilities/fileHelper');
 
+const itemsPerPage = 2;
+
+exports.getIndex = (req, res, next) => {
+  // console.log(req.session.isLoggedIn);
+  let page  = +req.query.page || 1;
+  let totalProducts;
+
+  Product
+    .find()
+    .countDocuments()
+    .then(productsNumber => {
+
+      totalProducts = productsNumber;
+
+      return Product
+        .find()
+        .skip((page - 1) * itemsPerPage)
+        .limit(itemsPerPage)
+        .then(products => {
+          // console.log(products);
+          res.render("shop/product-list", {
+            prods: products,
+            pageTitle: "All Products",
+            path: "/",
+            currentPage: page,
+            hasNextPage: itemsPerPage * page < totalProducts,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page -1,
+            lastPage: Math.ceil(totalProducts / itemsPerPage)
+          });
+        });
+    })
+    .catch(err => {
+      return errorCall(next, err);
+    }
+  );
+
+};
 
 exports.getProducts = (req, res, next) => {
+  let page  = +req.query.page || 1;
+  let totalProducts;
 
-  Product.find()
-    .then(products => {
-      // console.log(products);
-      res.render("shop/product-list", {
-        prods: products,
-        pageTitle: "All Products",
-        path: "/products",
-      });
+  Product
+    .find()
+    .countDocuments()
+    .then(productsNumber => {
+
+      totalProducts = productsNumber;
+
+      return Product
+        .find()
+        .skip((page - 1) * itemsPerPage)
+        .limit(itemsPerPage)
+        .then(products => {
+          // console.log(products);
+          res.render("shop/product-list", {
+            prods: products,
+            pageTitle: "All Products",
+            path: "/products",
+            currentPage: page,
+            hasNextPage: itemsPerPage * page < totalProducts,
+            hasPreviousPage: page > 1,
+            nextPage: page + 1,
+            previousPage: page -1,
+            lastPage: Math.ceil(totalProducts / itemsPerPage)
+          });
+        })
     })
     .catch(err => {
       return errorCall(next, err);
@@ -43,25 +101,6 @@ exports.getProduct = (req, res, next) => {
       return errorCall(next, err);
     }
   );
-};
-
-exports.getIndex = (req, res, next) => {
-  // console.log(req.session.isLoggedIn);
-
-  Product.find()
-    .then(products => {
-      // console.log(products);
-      res.render("shop/product-list", {
-        prods: products,
-        pageTitle: "All Products",
-        path: "/",
-      });
-    })
-    .catch(err => {
-      return errorCall(next, err);
-    }
-  );
-
 };
 
 exports.getCart = (req, res, next) => {
