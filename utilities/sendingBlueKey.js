@@ -1,2 +1,0 @@
-const smtpKey = 'xsmtpsib-61b084abd8a3ed43fd5e5e25f160af39dbede0ea17fc3ca0cf160498c0c092a9-zHyh6LxY278NPI1A';
-

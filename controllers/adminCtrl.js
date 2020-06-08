@@ -1,8 +1,8 @@
 const { validationResult } = require('express-validator');
 
 const Product = require("../Models/Product");
-const errorCall = require('../utilities/errorCall');
-const fileHelper = require('../utilities/fileHelper');
+const errorCall = require('../utils/errorCall');
+const fileHelper = require('../utils/fileHelper');
 
 const itemsPerPage = 2;
 

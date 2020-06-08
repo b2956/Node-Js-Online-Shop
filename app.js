@@ -9,7 +9,11 @@ const csrf = require('csurf');
 const connectFlash = require('connect-flash');
 const multer = require('multer');
 
-const MongoDbUriString = 'mongodb+srv://nodeJS_app:kLWrZsC9Q4e8BQA@cluster0-ei6pt.mongodb.net/shop?retryWrites=true&w=majority';
+const environmentVariables = require('./config/envVars');
+
+
+
+const MongoDbUriString = environmentVariables.MongoDbUri;
 
 const app = express();
 const mongoDbStore = new MongoDbStoreSession({
