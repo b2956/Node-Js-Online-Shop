@@ -6,13 +6,14 @@ const mailgunTransport = require('nodemailer-mailgun-transport');
 const { validationResult } = require('express-validator');
 
 const User = require('../Models/User');
-const { api_key, domain } = require('../utilities/mailGunAPIKey');
-const errorCall = require('../utilities/errorCall');
+const environmentVariables = require('../config/envVars');
+
+const errorCall = require('../utils/errorCall');
 
 const transporter = nodemailer.createTransport(mailgunTransport({
   auth: {
-    api_key,
-    domain
+    api_key: environmentVariables.MailGunApi_Key,
+    domain: environmentVariables.MailgGunDomain
   }
 }));
 
