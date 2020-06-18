@@ -25,8 +25,8 @@ const mongoDbStore = new MongoDbStoreSession({
 });
 const csrfProtection = csrf();
 
-const privateKey = fs.readFileSync('./server.key');
-const certificate = fs.readFileSync('./server.cert');
+// const privateKey = fs.readFileSync('./server.key');
+// const certificate = fs.readFileSync('./server.cert');
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -134,7 +134,8 @@ mongoose.connect( MongoDbUriString, {
     //     cert: certificate
     // }, app).listen(process.env.PORT || 3000);
     // console.log('Server is connected');
-    app.listen(process.env.PORT || 3000)
+    app.listen(process.env.PORT || 3000, 
+        console.log('Server has started!'))
 })
 .catch(err => {
     console.log(err);
