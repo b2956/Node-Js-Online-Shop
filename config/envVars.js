@@ -7,6 +7,7 @@ const dotenv = require('dotenv').config({
 module.exports = {
     MongoDbUri: process.env.MONGO_DB_URI,
     MailgGunDomain: process.env.MAILGUN_DOMAIN,
-    MailGunApi_Key: process.env.MAILGUN_API_KEY
+    MailGunApi_Key: process.env.MAILGUN_API_KEY,
+    StripeApiKey: process.env.STRIPE_API_KEY,
 }
 

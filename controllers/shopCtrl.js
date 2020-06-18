@@ -2,13 +2,15 @@ const fs = require('fs');
 const path = require('path');
 
 const PDFDocument = require('pdfkit');
-const stripe = require('stripe')('sk_test_aAffjfCHG9Y22Mzdbw1Sb7ji00vHCBjBNv');
 
 const Product = require("../Models/Product");
 const Order = require('../Models/Order');
 const errorCall = require('../utils/errorCall');
 const rootDir = require('../utils/path');
 const deleteFile = require('../utils/fileHelper');
+const envVariables = require('../config/envVars');
+
+const stripe = require('stripe')(envVariables.StripeApiKey);
 
 const itemsPerPage = 2;
 

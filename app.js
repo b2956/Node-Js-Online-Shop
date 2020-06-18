@@ -1,4 +1,6 @@
 const path = require("path");
+const fs = require('fs');
+const https = require('https');
 
 const express = require("express");
 const bodyParser = require("body-parser");
@@ -8,10 +10,11 @@ const MongoDbStoreSession = require('connect-mongodb-session')(session);
 const csrf = require('csurf');
 const connectFlash = require('connect-flash');
 const multer = require('multer');
+const helmet = require('helmet');
+const nodeCompression = require('compression');
+const morgan = require('morgan');
 
 const environmentVariables = require('./config/envVars');
-
-
 
 const MongoDbUriString = environmentVariables.MongoDbUri;
 
@@ -21,6 +24,9 @@ const mongoDbStore = new MongoDbStoreSession({
     collection: 'sessions'
 });
 const csrfProtection = csrf();
+
+const privateKey = fs.readFileSync('./server.key');
+const certificate = fs.readFileSync('./server.cert');
 
 const fileStorage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -44,8 +50,16 @@ const shopRoutes = require("./routes/shopRoutes");
 const authRoutes = require('./routes/authRoutes');
 const errorController = require("./controllers/errorCtrl");
 
+const accesLogStream = fs.createWriteStream(path.resolve(__dirname, 'logs', 'access.log'), 
+{flags: 'a'}
+);
+
 app.set("view engine", "ejs");
 app.set("views", "views");
+
+app.use(helmet());
+app.use(nodeCompression());
+app.use(morgan('combined', { stream: accesLogStream }));
 
 const User = require('./Models/User');
 
@@ -115,13 +129,13 @@ mongoose.connect( MongoDbUriString, {
     useUnifiedTopology: true,
 })
 .then(result => {
-    app.listen(3000);
-    console.log('Server is connected');
+    // https.createServer({
+    //     key: privateKey,
+    //     cert: certificate
+    // }, app).listen(process.env.PORT || 3000);
+    // console.log('Server is connected');
+    app.listen(process.env.PORT || 3000)
 })
 .catch(err => {
     console.log(err);
 });
-
-
-
-
